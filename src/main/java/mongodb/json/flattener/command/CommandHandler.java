@@ -16,18 +16,21 @@ import mongodb.json.flattener.ObjectFlattener;
 public class CommandHandler {
 
 	private final static Pattern COMMAND_PATTERN = Pattern.compile("cat *.json | flatten");
+	private final static String QUIT_COMMAND = "quit";
 	private final static int INDENTATION_SPACING = 4;
-	
-	public String readCommand(InputStreamReader inputStreamReader) throws IOException {
-		try (BufferedReader commandReader = new BufferedReader(inputStreamReader)) {
-			String command = commandReader.readLine();
-			return command;
-		}
+
+	public String readCommand(BufferedReader commandReader) throws IOException {
+		String command = commandReader.readLine();
+		return command;
 	}
 
 	public boolean validateCommand(String command) {
 		Matcher matcher = COMMAND_PATTERN.matcher(command);
 		return matcher.find();
+	}
+
+	public boolean isQuitCommand(String command) {
+		return command.equalsIgnoreCase(QUIT_COMMAND);
 	}
 
 	private String extractFileName(String command) {
@@ -51,7 +54,7 @@ public class CommandHandler {
 		JsonFlattener<JSONObject> jsonFlattener = new ObjectFlattener<JSONObject>(flattenedJson, null, jsonObject);
 		jsonFlattener.flatten();
 		flattenedJson.append("}");
-		JSONObject flattenedJsonObject= new JSONObject(flattenedJson.toString());
+		JSONObject flattenedJsonObject = new JSONObject(flattenedJson.toString());
 		return flattenedJsonObject.toString(INDENTATION_SPACING);
 	}
 
